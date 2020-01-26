@@ -42,7 +42,7 @@ public class Prototipo extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.GridLayout(1, 3, 3, 0));
 
         jLabel3.setBackground(new java.awt.Color(153, 255, 0));
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 36)); // NOI18N
         jLabel3.setText("jLabel1");
         jLabel3.setOpaque(true);
         jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
