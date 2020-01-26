@@ -602,12 +602,19 @@ public class JFrameKiosko extends javax.swing.JFrame {
     private void jLabelPagarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelPagarMouseClicked
         // TODO add your handling code here:
         if (jLabelPagar.isEnabled()){
-            initPaginacion();
-            initContentTable();
-            initVariablesActuales();
+            SectorActual = JLabelSector[0].getName();
+            FamiliaActual = JLabelFamilia[0].getName();
+            setContentPanel(TYPE_SECTOR);
+            setContentPanel(TYPE_FAMILIA);
+            setContentPanel(TYPE_PRODUCTO);
+            
             setActiveBanner(TYPE_SECTOR, true);
             setActiveBanner(TYPE_PRODUCTO, false);
 
+            initPaginacion();
+            initContentTable();
+            initVariablesActuales();
+            
             jLabelPagar.setEnabled(false);
             jLabelPagar.setBackground(WHITE);
         }
@@ -1006,11 +1013,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
         jlabel.setForeground(ForegroundColor);
     }
     
-    private void setActiveButtom(javax.swing.JLabel jlabel, String path ){
-        jlabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(path)));
-        jlabel.repaint();
-    }
-    
     private void setElementChoise(javax.swing.JLabel[] jlabels, String itemActual ){
         for (JLabel jLabel : jlabels) {
             if (itemActual.equals(jLabel.getName()) && !itemActual.equals(SIN_ASIGNAR)) {
@@ -1023,6 +1025,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
         }
     }
     
+    private void setActiveButtom(javax.swing.JLabel jlabel, String path ){
+        jlabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(path)));
+        jlabel.repaint();
+    }
+    
     private void setActiveBanner(String tipo, Boolean activate){
         if (tipo.equals(this.TYPE_SECTOR)) {
             if (activate) 
@@ -1033,7 +1040,8 @@ public class JFrameKiosko extends javax.swing.JFrame {
                 setActiveButtom(jLabelLeftSector, LEFT_OFF);
                 setActiveButtom(jLabelRightSector, RIGHT_OFF);
             }
-            setElementChoise(JLabelSector, SectorActual); 
+            setElementChoise(JLabelSector, SectorActual);
+            setElementChoise(JLabelFamilia, FamiliaActual);
         }
         if (tipo.equals(this.TYPE_FAMILIA)) {
             if (activate) 
@@ -1057,33 +1065,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
             }
         }
     }
-    
-    private void setActiveJLabel(javax.swing.JLabel jlabels, String sentido){
-        if (sentido.equals(TYPE_LEFT)){
-            if (paginaActualSectores == 1) 
-                setActiveButtom(jlabels, LEFT_OFF);
-            else 
-                setActiveButtom(jlabels, LEFT_ON);
-        }
-        if (sentido.equals(TYPE_RIGHT)){
-            if (paginaActualSectores == numeroDePaginaSectores) 
-                setActiveButtom(jlabels, RIGHT_OFF);
-            else 
-                setActiveButtom(jlabels, RIGHT_ON);
-        }
-    }
-    
-    private Boolean isActiveBanner(String tipo){
-        if (tipo.equals(this.TYPE_SECTOR) && jLabelTituloSector.isEnabled())
-            return true;
-        if (tipo.equals(this.TYPE_FAMILIA) && jLabelTituloFamilia.isEnabled())
-            return true;
-        if (tipo.equals(this.TYPE_PRODUCTO) && jLabelTituloProducto.isEnabled())
-            return true;
-        return false;
-    }
-    
-    
+
     ////////////////////////////////////////////////////////////////////////////
     //*                      FUNCIONDES DE CALCULOS                            */
     ////////////////////////////////////////////////////////////////////////////
