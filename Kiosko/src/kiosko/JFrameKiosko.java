@@ -21,7 +21,7 @@ import javax.swing.table.TableColumnModel;
  * @author TPV
  */
 public class JFrameKiosko extends javax.swing.JFrame {
-
+ 
     ////////////////////////////////////////////////////////////////////////////
     //*               VALIABLES DE CONFIGUARACION POR DEFECTO                 */
     ////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
     public int elementosPorPaginaProductos = 20; //edit
     public int numeroDeInstruncciones = 5; //edit
     public int blinkTime = 400;
-
+    
     
     ////////////////////////////////////////////////////////////////////////////
     //*                             CONSTANTES                                */
@@ -62,7 +62,8 @@ public class JFrameKiosko extends javax.swing.JFrame {
     public java.awt.Color GREEN = new java.awt.Color(38, 255, 0);
     public java.awt.Color GRAY = new java.awt.Color(178, 179, 179);
     public java.awt.Color GRAY_2 = new java.awt.Color(91,91,91);
-    public java.awt.Color WHITE = new java.awt.Color(255,255,255);
+    public java.awt.Color WHITE = new java.awt.Color(215,233,214);
+    //public java.awt.Color WHITE = new java.awt.Color(255,255,255);
     public java.awt.Color ROSA = new java.awt.Color(210,205,231);
     
     public java.awt.Color YELLOW_OFF = new java.awt.Color(255, 251, 219);
@@ -78,8 +79,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
     public String UP_OFF = "/kiosko/imagenes/up_off.png";
     public String DOWN_ON = "/kiosko/imagenes/down_on.png";
     public String DOWN_OFF = "/kiosko/imagenes/down_off.png";
-    
-    
     
     public java.awt.Font NORMAL = new java.awt.Font("Arial", Font.PLAIN, 15);
     public java.awt.Font BOLD = new java.awt.Font("Arial", Font.BOLD, 15);
@@ -104,8 +103,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
     public String ProductoInicial = "SELECCIONE ARTICULOS"; // carga inicial por defecto dinamica
     public String ProductoProceso = "YA PUEDE SELECCIONAR UN ARTICULO"; // carga inicial por defecto dinamica
     
-    public Boolean FamiliaSelected = true;
-    
     public Boolean SectorThread = false;
     public Boolean FamiliaThread = false;
     public Boolean ProductoThread = false;
@@ -118,7 +115,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
     ////////////////////////////////////////////////////////////////////////////
     //*                             ELEMENTOS                                 */
     ////////////////////////////////////////////////////////////////////////////
-    public javax.swing.JLabel[] JLabelSector = new javax.swing.JLabel[elementosPorPaginaSectores];
+    public javax.swing.JLabel[] JLabelSector = null;
     public javax.swing.JLabel[] JLabelFamilia = new javax.swing.JLabel[elementosPorPaginaFamilias];
     public javax.swing.JLabel[] JLabelProductos = new javax.swing.JLabel[elementosPorPaginaProductos];
     
@@ -129,6 +126,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
     public javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(items, headerTable);
     public Integer fila = 0;
 
+    public JDialogPagar dialog = null;
     
     ////////////////////////////////////////////////////////////////////////////
     //*                 VARIABLES PARA EL MANEJOS DE DATOS                     */
@@ -143,6 +141,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
         "5 - retire el ticket y entregelo en barra"
     };
     
+    
     ////////////////////////////////////////////////////////////////////////////
     //*                     CONSTRUCTOR JFrameKiosko                        */
     ////////////////////////////////////////////////////////////////////////////
@@ -152,7 +151,8 @@ public class JFrameKiosko extends javax.swing.JFrame {
         this.setType(Type.UTILITY);
         initComponents();
         initComponentsCustom();
-        this.setLocationRelativeTo(null);
+        //this.setLocationRelativeTo(null);
+        this.setSize(1080, 1920);
     }
     
     
@@ -163,6 +163,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
         
         datos.CargaDatos();
         
+        initVariablesDefecto();
         initTableModel();
         initPaginacion();
         
@@ -196,9 +197,14 @@ public class JFrameKiosko extends javax.swing.JFrame {
         setElementChoise(JLabelFamilia, TODO_APAGADO);
         setElementChoise(JLabelProductos, TODO_APAGADO); 
                 
-
+        if (JLabelSector.length == 1) eventSectorConditional( JLabelSector[0].getName());
     }
-
+    
+    private void initVariablesDefecto(){
+        if (datos.sector.length >= 1 && datos.sector.length <5 ) elementosPorPaginaSectores = datos.sector.length;
+        JLabelSector = new javax.swing.JLabel[elementosPorPaginaSectores];
+    }
+    
     private void initJLabelInstruccion(){
         for(Integer i=0; i<JLabelInstrucciones.length; i++){
             JLabelInstrucciones[i] = new javax.swing.JLabel();
@@ -331,10 +337,52 @@ public class JFrameKiosko extends javax.swing.JFrame {
         FamiliaActual = JLabelFamilia[0].getName();
     }
     
+    private void initJDialogPagar(){
+        dialog = new JDialogPagar(this, true);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                System.exit(0);
+            }
+        });
+        dialog.jButtonAceptar.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    eventPagarMouseClicked(evt);
+                }
+            } );
+        dialog.setVisible(true);
+        /*dialog.jLabelPago.setText("Realiazando Pago");
+        dialog.jProgressBarPago.setValue(20);
+        dialog.jProgressBarPago.repaint();*/
+    }
+    
     
     ////////////////////////////////////////////////////////////////////////////
     //*                       FUNCIONDES DE EVENTOS                           */
     ////////////////////////////////////////////////////////////////////////////
+    
+    private void eventSectorConditional(String sector) { 
+        SectorActual = sector;
+        setContentPanel(TYPE_SECTOR);
+
+        setActiveBanner(TYPE_SECTOR, false);
+        setActiveBanner(TYPE_FAMILIA, true);
+        setActiveBanner(TYPE_PRODUCTO, false);
+
+        setActiveInstruccion(INSTR_2);
+
+        jLabelTituloSector.setText("SECTOR "+sector);
+        jLabelTituloFamilia.setText(FamiliaInicial);
+
+        setElementChoise(JLabelSector, SectorActual);
+        setElementChoise(JLabelFamilia, TODO_ACTIVO);
+        setElementChoise(JLabelProductos, TODO_APAGADO); 
+
+        jPanelProductos.setBackground(ROSA);
+        
+    }
+    
     private void eventSectorMouseClicked(java.awt.event.MouseEvent evt) { 
         javax.swing.JLabel ele = (javax.swing.JLabel) evt.getSource();
         System.out.println(ele.getName());
@@ -398,8 +446,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
             setActiveBanner(TYPE_FAMILIA, false);
             setActiveBanner(TYPE_PRODUCTO, false);
             
-            setActiveInstruccion(INSTR_4);
-            setActiveInstruccion(INSTR_5);
+            setActiveInstruccion(INSTR_3);
             
             jLabelTituloSector.setText("USTED HA SELECCIONADO "+SectorActual);
             jLabelTituloFamilia.setText("USTED HA SELECCIONADO "+FamiliaActual); 
@@ -417,7 +464,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
     }
     
     private void eventPagarMouseClicked(java.awt.event.MouseEvent evt) { 
-        javax.swing.JLabel ele = (javax.swing.JLabel) evt.getSource();
         if (jLabelPagar.isEnabled()){
             SectorActual = JLabelSector[0].getName();
             FamiliaActual = JLabelFamilia[0].getName();
@@ -433,8 +479,10 @@ public class JFrameKiosko extends javax.swing.JFrame {
             initContentTable();
             initVariablesActuales();
             
-            ele.setEnabled(false);
-            ele.setBackground(WHITE);
+            jLabelPagar.setEnabled(false);
+            jLabelPagar.setBackground(WHITE);
+            
+            //setActiveInstruccion(INSTR_4);
             
             setActiveInstruccion(INSTR_1);
             
@@ -447,6 +495,8 @@ public class JFrameKiosko extends javax.swing.JFrame {
             setElementChoise(JLabelProductos, TODO_APAGADO); 
             
            jPanelProductos.setBackground(ROSA);
+
+           dialog.event();
         }
     }
     
@@ -457,6 +507,13 @@ public class JFrameKiosko extends javax.swing.JFrame {
             jLabelTotal.setText(getTotal(jLabelTotal.getText(), value, this.TYPE_RESTA));
             jTableFactura.setValueAt("", this.fila, 0);
             jTableFactura.setValueAt("", this.fila, 1);
+        }
+    }
+    
+    private void eventPagarProceso(java.awt.event.MouseEvent evt) { 
+        if (jLabelPagar.isEnabled()){
+            setActiveInstruccion(INSTR_4);
+            initJDialogPagar();
         }
     }
     
@@ -471,7 +528,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        jPanelKiosko = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanelFamilia = new javax.swing.JPanel();
@@ -505,13 +562,15 @@ public class JFrameKiosko extends javax.swing.JFrame {
         jPanelInstruncciones = new javax.swing.JPanel();
         jLabelBorrarUltimo = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jPanelUp = new javax.swing.JPanel();
+        jPanelDown = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setSize(new java.awt.Dimension(1080, 1020));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanelKiosko.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelKiosko.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(210, 205, 231));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -564,7 +623,18 @@ public class JFrameKiosko extends javax.swing.JFrame {
         jLayeredPaneSector.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabelRightSector.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabelRightSector.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabelRightSectorMouseClicked(evt);
+            }
+        });
         jLayeredPaneSector.add(jLabelRightSector, new org.netbeans.lib.awtextra.AbsoluteConstraints(712, 0, 77, 50));
+
+        jLabelLeftSector.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabelLeftSectorMouseClicked(evt);
+            }
+        });
         jLayeredPaneSector.add(jLabelLeftSector, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 77, 50));
 
         jLabelTituloSector.setBackground(new java.awt.Color(255, 255, 51));
@@ -617,7 +687,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
 
         jPanel2.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 359, -1, 50));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 1, 798, 955));
+        jPanelKiosko.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 1, 798, 955));
 
         jPanel3.setBackground(new java.awt.Color(210, 205, 231));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -735,16 +805,26 @@ public class JFrameKiosko extends javax.swing.JFrame {
 
         jPanel3.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(4, 4, 270, -1));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1, 1, 280, 955));
+        jPanelKiosko.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1, 1, 280, 955));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1080, 957));
+        getContentPane().add(jPanelKiosko, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 482, 1080, 957));
+
+        jPanelUp.setBackground(new java.awt.Color(210, 205, 231));
+        jPanelUp.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelUp.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().add(jPanelUp, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1079, 483));
+
+        jPanelDown.setBackground(new java.awt.Color(210, 205, 231));
+        jPanelDown.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        getContentPane().add(jPanelDown, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 1438, 1079, 482));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabelPagarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelPagarMouseClicked
         // TODO add your handling code here:
-        eventPagarMouseClicked(evt);
+        eventPagarProceso(evt);
+        //eventPagarMouseClicked(evt);
     }//GEN-LAST:event_jLabelPagarMouseClicked
 
     private void jLabelCancelarPedidoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelCancelarPedidoMouseClicked
@@ -788,6 +868,16 @@ public class JFrameKiosko extends javax.swing.JFrame {
         eventPagarMouseClicked(evt);
     }//GEN-LAST:event_jLabel5MouseClicked
 
+    private void jLabelRightSectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelRightSectorMouseClicked
+        // TODO add your handling code here:
+        setContentPanel(TYPE_SECTOR, TYPE_RIGHT);
+    }//GEN-LAST:event_jLabelRightSectorMouseClicked
+
+    private void jLabelLeftSectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelLeftSectorMouseClicked
+        // TODO add your handling code here:
+        setContentPanel(TYPE_SECTOR, TYPE_LEFT);
+    }//GEN-LAST:event_jLabelLeftSectorMouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
@@ -808,7 +898,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
     private javax.swing.JLayeredPane jLayeredPaneFamilia;
     private javax.swing.JLayeredPane jLayeredPaneProducto;
     private javax.swing.JLayeredPane jLayeredPaneSector;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -818,10 +907,13 @@ public class JFrameKiosko extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanelDown;
     private javax.swing.JPanel jPanelFamilia;
     private javax.swing.JPanel jPanelInstruncciones;
+    private javax.swing.JPanel jPanelKiosko;
     private javax.swing.JPanel jPanelProductos;
     private javax.swing.JPanel jPanelSector;
+    private javax.swing.JPanel jPanelUp;
     private javax.swing.JTable jTableFactura;
     // End of variables declaration//GEN-END:variables
     
@@ -922,7 +1014,6 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     }
                     FamiliaActual = datos.sector[j].familia[pivote].getDescripcionCorta();
                     numeroDePaginaFamilias = configPag(datos.sector[j].familia.length, elementosPorPaginaFamilias);
-                    break;
                 }
             }
         }
@@ -946,13 +1037,12 @@ public class JFrameKiosko extends javax.swing.JFrame {
                                 }
                             }
                             numeroDePaginaProductos = configPag(datos.sector[j].familia[jj].producto.length, elementosPorPaginaProductos);
-                            break;
                         }
                     }
-                    break;
                 }
             }
         }
+        setArrowVisible(tipo);
     }
     
     private void setContentPanel(String tipo){
@@ -1146,15 +1236,70 @@ public class JFrameKiosko extends javax.swing.JFrame {
         }
     }
     
-    private void setActiveButtom(javax.swing.JLabel jlabel, String path ){
-        jlabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(path)));
-        jlabel.repaint();
+    private void setArrowVisible(String tipo){
+        
+        if (tipo.equals(TYPE_SECTOR)){
+            jLabelLeftSector.setIcon(new javax.swing.ImageIcon(getClass().getResource(LEFT_ON)));
+            jLabelRightSector.setIcon(new javax.swing.ImageIcon(getClass().getResource(RIGHT_ON)));
+            //ELIMINA IZQ - DER
+            if (PaginaActualSectores==1 && numeroDePaginaSectores==1){
+                jLabelLeftSector.setIcon(null);
+                jLabelRightSector.setIcon(null);
+            }
+            //ELIMINA IZQ
+            else if (PaginaActualSectores==1){
+                jLabelLeftSector.setIcon(null);
+            }
+            //ELIMINA DER
+            else if (PaginaActualSectores==numeroDePaginaSectores){
+                jLabelRightSector.setIcon(null);
+            }
+            jLabelLeftSector.repaint();
+            jLabelRightSector.repaint();
+        }
+        else if (tipo.equals(TYPE_FAMILIA)){
+            jLabelLeftFamilia.setIcon(new javax.swing.ImageIcon(getClass().getResource(LEFT_ON)));
+            jLabelRightFamilia.setIcon(new javax.swing.ImageIcon(getClass().getResource(RIGHT_ON)));
+            //ELIMINA IZQ - DER
+            if (PaginaActualFamilias==1 && numeroDePaginaFamilias==1){
+                jLabelLeftFamilia.setIcon(null);
+                jLabelRightFamilia.setIcon(null);
+            }
+            //ELIMINA IZQ
+            else if (PaginaActualFamilias==1){
+                jLabelLeftFamilia.setIcon(null);
+            }
+            //ELIMINA DER
+            else if (PaginaActualFamilias==numeroDePaginaFamilias){
+                jLabelRightFamilia.setIcon(null);
+            }
+            jLabelLeftFamilia.repaint();
+            jLabelRightFamilia.repaint();
+        }
+        else if (tipo.equals(TYPE_PRODUCTO)){
+            jLabelUpProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource(UP_ON)));
+            jLabelDownProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource(DOWN_ON)));
+            //ELIMINA IZQ - DER
+            if (PaginaActualProductos==1 && numeroDePaginaProductos==1){
+                jLabelUpProducto.setIcon(null);
+                jLabelDownProducto.setIcon(null);
+            }
+            //ELIMINA IZQ
+            else if (PaginaActualProductos==1){
+                jLabelUpProducto.setIcon(null);
+            }
+            //ELIMINA DER
+            else if (PaginaActualProductos==numeroDePaginaProductos){
+                jLabelDownProducto.setIcon(null);
+            }
+            jLabelUpProducto.repaint();
+            jLabelDownProducto.repaint();
+        }
     }
-    
+ 
     private void setActiveBanner(String tipo, Boolean activate){
         if (tipo.equals(this.TYPE_SECTOR)) {
-            setActiveButtom(jLabelLeftSector, LEFT_ON);
-            setActiveButtom(jLabelRightSector, RIGHT_ON);
+            setArrowVisible(tipo);
             if (activate){ 
                 setBlinkSector();
             } else {
@@ -1164,8 +1309,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
             }
         }
         if (tipo.equals(this.TYPE_FAMILIA)) {
-            setActiveButtom(jLabelLeftFamilia, LEFT_ON);
-            setActiveButtom(jLabelRightFamilia, RIGHT_ON);
+            setArrowVisible(tipo);
             if (activate){ 
                 setBlinkFamilia(); 
             } else {
@@ -1181,11 +1325,8 @@ public class JFrameKiosko extends javax.swing.JFrame {
                 ProductoThread = false;
                 setActiveTitle(jLabelTituloProducto, WHITE, GRAY);
             }
-            setActiveButtom(jLabelUpProducto, UP_ON);
-            setActiveButtom(jLabelDownProducto, DOWN_ON);
-            jLabelUpProducto.repaint();
-            jLabelDownProducto.repaint();
-             setPosition(TYPE_PRODUCTO);
+            setArrowVisible(tipo);
+            setPosition(TYPE_PRODUCTO);
         }
     }
     
@@ -1249,6 +1390,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
         return output + euro;
     }   
 
+    
 }
 
 /*
@@ -1271,6 +1413,12 @@ public class JFrameKiosko extends javax.swing.JFrame {
         2) el banner cambiar de nombre segun el sector y familia  
         3) colocar fonto al selecionar acticulos al panel
 
+        <<<<< Cambios Domingo 2 de Febrero
 
-
+        * Manejos de datos desde de BD solo procedimientos en  SQL
+        * Integrar imagenes nuevas de sectores, familias y articulos
+        * Integrar nuevos botones borders azules
+        * conectar con la BD
+        * Integrar los procedimientos BD con el Kiosko
+        
 */

@@ -44,7 +44,7 @@ public class Datos {
         }
 
         String[] letra = new String[]{"A", "B" , "C", "D", "E", "F", "G"};
-        for (Integer i = 0; i<= map.size(); i++ ) {
+        for (Integer i = 0; i< map.size(); i++ ) {
             String key = "Sector 0";
             if (i==1) key = "Sector 1";
             if (i==2) key = "Sector 2";
