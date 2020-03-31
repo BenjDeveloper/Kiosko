@@ -81,6 +81,8 @@ public class Prototipo extends javax.swing.JFrame {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("2");
         jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel2.setPreferredSize(null);
         jPanel.add(jLabel2);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 60)); // NOI18N

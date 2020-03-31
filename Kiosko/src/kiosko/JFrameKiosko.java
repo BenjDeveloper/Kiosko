@@ -1,12 +1,13 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
+ * To change this template file, choose Tools | Templates 
  * and open the template in the editor.
  */
 
 package kiosko;
 
 import Libs.Datos;
+import Test.ByosImagen;
 import java.awt.Font;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,12 +218,28 @@ public class JFrameKiosko extends javax.swing.JFrame {
     }
 
     private void initJPanel(javax.swing.JPanel JPanel, javax.swing.JLabel[] array, String tipo) {
+        int x = 0;
+        int y = 0;
+        
+        if (tipo.equals(TYPE_SECTOR)){
+            x = JPanel.getWidth()/elementosPorPaginaSectores - 5;
+            y = JPanel.getHeight();
+        }
+        if (tipo.equals(TYPE_FAMILIA)){
+            x = JPanel.getWidth()/elementosPorPaginaFamilias - 5;
+            y = JPanel.getHeight();
+        }
+        if (tipo.equals(TYPE_PRODUCTO)){
+            x = JPanel.getWidth()/5;
+            y = JPanel.getHeight()/4;
+        }
         for(Integer i=0; i<array.length; i++){
             array[i] = new javax.swing.JLabel();
             array[i].setOpaque(true);
             array[i].setBackground(java.awt.Color.WHITE);
             array[i].setMaximumSize(new java.awt.Dimension(0,0));
             array[i].setFont(new java.awt.Font("Tahoma", 0, 1));
+            array[i].setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             array[i].addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -231,6 +248,7 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     if (tipo.equals(TYPE_PRODUCTO))eventProductoMouseClicked(evt);
                 }
             } );
+            array[i].setSize(new java.awt.Dimension(x,y));
             JPanel.add(array[i]);
         }
     }       
@@ -268,10 +286,10 @@ public class JFrameKiosko extends javax.swing.JFrame {
             for(Integer i=0; i<array.length; i++){
                 if (i < datos.sector.length){
                     array[i].setName(datos.sector[i].getDescripcionCorta());
-                    array[i].setIcon(datos.sector[i].getImagen());
+                    array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], datos.sector[i].getImagen()) );                     
                 } else {
                     array[i].setName(SIN_ASIGNAR);
-                    array[i].setIcon(new javax.swing.ImageIcon("static/sec.png"));
+                    array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], new javax.swing.ImageIcon("static/sec.png")) );     
                 }  
             }
             this.numeroDePaginaSectores = configPag(datos.sector.length, elementosPorPaginaSectores);
@@ -282,10 +300,10 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     for(Integer i=0; i<array.length; i++){ 
                         if (i < datos.sector[j].familia.length){
                             array[i].setName(datos.sector[j].familia[i].getDescripcionCorta());
-                            array[i].setIcon(datos.sector[j].familia[i].getImagen());
+                            array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], datos.sector[j].familia[i].getImagen()) );                     
                         } else {
                             array[i].setName(SIN_ASIGNAR);
-                            array[i].setIcon(new javax.swing.ImageIcon("static/fam.png"));
+                            array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], new javax.swing.ImageIcon("static/fam.png")) );                     
                         } 
                     }
                     this.numeroDePaginaFamilias = configPag(datos.sector[j].familia.length, elementosPorPaginaFamilias);
@@ -301,11 +319,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
                             for(Integer i=0; i<array.length; i++) { 
                                 if (i < datos.sector[j].familia[jj].producto.length) {
                                     array[i].setName(datos.sector[j].familia[jj].producto[i].getDescripcionCorta());
-                                    array[i].setIcon(datos.sector[j].familia[jj].producto[i].getImagen());
+                                    array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], datos.sector[j].familia[jj].producto[i].getImagen()) );                     
                                     array[i].setText(datos.sector[j].familia[jj].producto[i].getcosto());
                                 } else {
                                     array[i].setName(SIN_ASIGNAR);
-                                    array[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                                    array[i].setIcon(ByosImagen.JLabelAjustarIcono(array[i], new javax.swing.ImageIcon("static/img.png")) );                                                 
                                     array[i].setText("0.00");
                                 }
                             }
@@ -953,10 +971,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
             for(Integer i=0; i<JLabelSector.length; i++){
                 if (primerPosicion < datos.sector.length){
                     JLabelSector[i].setName(datos.sector[primerPosicion].getDescripcionCorta());
-                    JLabelSector[i].setIcon(datos.sector[primerPosicion++].getImagen());
+                    JLabelSector[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelSector[i], datos.sector[primerPosicion++].getImagen()) );
+                    
                 } else {
                     JLabelSector[i].setName(SIN_ASIGNAR);
-                    JLabelSector[i].setIcon(new javax.swing.ImageIcon("static/sec.png"));
+                    JLabelSector[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelSector[i], new javax.swing.ImageIcon("static/sec.png")) ); 
                 }  
             }
             primerPosicion = 0;
@@ -964,21 +983,21 @@ public class JFrameKiosko extends javax.swing.JFrame {
             for(Integer i=0; i<JLabelFamilia.length; i++){ 
                 if (primerPosicion < datos.sector[pivote].familia.length){
                     JLabelFamilia[i].setName(datos.sector[pivote].familia[primerPosicion].getDescripcionCorta());
-                    JLabelFamilia[i].setIcon(datos.sector[pivote].familia[primerPosicion++].getImagen());
+                    JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], datos.sector[pivote].familia[primerPosicion++].getImagen()) );
                 } else {
                     JLabelFamilia[i].setName(SIN_ASIGNAR);
-                    JLabelFamilia[i].setIcon(new javax.swing.ImageIcon("static/fam.png"));
+                    JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], new javax.swing.ImageIcon("static/fam.png")) ); 
                 } 
             }
             primerPosicion = 0;
             for(Integer i=0; i<JLabelProductos.length; i++) { 
                 if (i < datos.sector[pivote].familia[0].producto.length) {
                     JLabelProductos[i].setName(datos.sector[pivote].familia[0].producto[primerPosicion].getDescripcionCorta());
-                    JLabelProductos[i].setIcon(datos.sector[pivote].familia[0].producto[primerPosicion].getImagen());
+                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], datos.sector[pivote].familia[0].producto[primerPosicion].getImagen()) );
                     JLabelProductos[i].setText(datos.sector[pivote].familia[0].producto[primerPosicion++].getcosto());
                 } else {
                     JLabelProductos[i].setName(SIN_ASIGNAR);
-                    JLabelProductos[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], new javax.swing.ImageIcon("static/img.png")) ); 
                     JLabelProductos[i].setText("0.00");
                 }
             }
@@ -994,21 +1013,21 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     for(Integer i=0; i<JLabelFamilia.length; i++){ 
                         if (primerPosicion < datos.sector[j].familia.length){
                             JLabelFamilia[i].setName(datos.sector[j].familia[primerPosicion].getDescripcionCorta());
-                            JLabelFamilia[i].setIcon(datos.sector[j].familia[primerPosicion++].getImagen());
+                            JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], datos.sector[j].familia[primerPosicion++].getImagen()) ); 
                         } else {
                             JLabelFamilia[i].setName(SIN_ASIGNAR);
-                            JLabelFamilia[i].setIcon(new javax.swing.ImageIcon("static/fam.png"));
+                            JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], new javax.swing.ImageIcon("static/fam.png")) ); 
                         } 
                     }
                     primerPosicion = 0;
                     for(Integer i=0; i<JLabelProductos.length; i++) { 
                         if (i < datos.sector[j].familia[pivote].producto.length) {
                             JLabelProductos[i].setName(datos.sector[j].familia[pivote].producto[primerPosicion].getDescripcionCorta());
-                            JLabelProductos[i].setIcon(datos.sector[j].familia[pivote].producto[primerPosicion].getImagen());
+                            JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], datos.sector[j].familia[pivote].producto[primerPosicion].getImagen()) ); 
                             JLabelProductos[i].setText(datos.sector[j].familia[pivote].producto[primerPosicion++].getcosto());
                         } else {
                             JLabelProductos[i].setName(SIN_ASIGNAR);
-                            JLabelProductos[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                            JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], new javax.swing.ImageIcon("static/img.png")) ); 
                             JLabelProductos[i].setText("0.00");
                         }
                     }
@@ -1028,11 +1047,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
                             for(Integer i=0; i<JLabelProductos.length; i++) { 
                                 if (primerPosicion < datos.sector[j].familia[jj].producto.length) {
                                     JLabelProductos[i].setName(datos.sector[j].familia[jj].producto[primerPosicion].getDescripcionCorta());
-                                    JLabelProductos[i].setIcon(datos.sector[j].familia[jj].producto[primerPosicion].getImagen());
+                                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], datos.sector[j].familia[jj].producto[primerPosicion].getImagen()) ); 
                                     JLabelProductos[i].setText(datos.sector[j].familia[jj].producto[primerPosicion++].getcosto());
                                 } else {
                                     JLabelProductos[i].setName(SIN_ASIGNAR);
-                                    JLabelProductos[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], new javax.swing.ImageIcon("static/img.png")) ); 
                                     JLabelProductos[i].setText("0.00");
                                 }
                             }
@@ -1055,10 +1074,10 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     for(Integer i=0; i<JLabelFamilia.length; i++) { 
                         if (primerPosicion < datos.sector[j].familia.length) {
                             JLabelFamilia[i].setName(datos.sector[j].familia[primerPosicion].getDescripcionCorta());
-                            JLabelFamilia[i].setIcon(datos.sector[j].familia[primerPosicion++].getImagen());
+                            JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], datos.sector[j].familia[primerPosicion++].getImagen()) ); 
                         } else {
                             JLabelFamilia[i].setName(SIN_ASIGNAR);
-                            JLabelFamilia[i].setIcon(new javax.swing.ImageIcon("static/fam.png"));
+                            JLabelFamilia[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelFamilia[i], new javax.swing.ImageIcon("static/fam.png")) );     
                         } 
                     }
                     numeroDePaginaFamilias = configPag(datos.sector[j].familia.length, elementosPorPaginaFamilias);
@@ -1068,11 +1087,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
                     for(Integer i=0; i<JLabelProductos.length; i++) { 
                             if (i < datos.sector[j].familia[0].producto.length) {
                                 JLabelProductos[i].setName(datos.sector[j].familia[pivote].producto[primerPosicion].getDescripcionCorta());
-                                JLabelProductos[i].setIcon(datos.sector[j].familia[pivote].producto[primerPosicion].getImagen());
+                                JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], datos.sector[j].familia[pivote].producto[primerPosicion].getImagen()) );     
                                 JLabelProductos[i].setText(datos.sector[j].familia[pivote].producto[primerPosicion++].getcosto());
                             } else {
                                 JLabelProductos[i].setName(SIN_ASIGNAR);
-                                JLabelProductos[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                                JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], new javax.swing.ImageIcon("static/img.png")) );     
                                 JLabelProductos[i].setText("0.00");
                             }
                     }
@@ -1090,11 +1109,11 @@ public class JFrameKiosko extends javax.swing.JFrame {
                             for(Integer i=0; i<JLabelProductos.length; i++) { 
                                 if (i < datos.sector[j].familia[jj].producto.length) {
                                     JLabelProductos[i].setName(datos.sector[j].familia[jj].producto[i].getDescripcionCorta());
-                                    JLabelProductos[i].setIcon(datos.sector[j].familia[jj].producto[i].getImagen());
+                                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], datos.sector[j].familia[jj].producto[i].getImagen()) );    
                                     JLabelProductos[i].setText(datos.sector[j].familia[jj].producto[i].getcosto());
                                 } else {
                                     JLabelProductos[i].setName(SIN_ASIGNAR);
-                                    JLabelProductos[i].setIcon(new javax.swing.ImageIcon("static/img.png"));
+                                    JLabelProductos[i].setIcon(ByosImagen.JLabelAjustarIcono(JLabelProductos[i], new javax.swing.ImageIcon("static/img.png")) );     
                                     JLabelProductos[i].setText("0.00");
                                 }
                             }
