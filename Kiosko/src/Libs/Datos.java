@@ -6,21 +6,51 @@
 
 package Libs;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author TPV
  */
 public class Datos {
-
+    
     public tblSector[] sector;
 
     public Datos() {
     }
-
+    
+    public void CargarDatosSQL(){
+    
+        String InSql = "CALL dbsempresas.dias_mes_dinamico('2019/11/01');";
+        try {
+            System.out.println(InSql);
+            ResultSet rs = Conexion.Ejecutar_Sql(InSql);
+            ResultSetMetaData metadata = rs.getMetaData();
+            int columnCount = metadata.getColumnCount();
+            ArrayList<HashMap> list = new ArrayList<>();
+            int row = 0;
+            while (rs.next()){
+                HashMap<String, String> map = new HashMap<>(columnCount);
+                for(int i=1; i<=columnCount; ++i){
+                    map.put(metadata.getColumnName(i),rs.getString(i));
+                }
+                list.add(map);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Datos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    
     public void CargaDatos(){
 
         Map<String,String[]> map = new HashMap();
@@ -44,7 +74,7 @@ public class Datos {
         }
 
         String[] letra = new String[]{"A", "B" , "C", "D", "E", "F", "G"};
-        for (Integer i = 0; i<= map.size(); i++ ) {
+        for (Integer i = 0; i< map.size(); i++ ) {
             String key = "Sector 0";
             if (i==1) key = "Sector 1";
             if (i==2) key = "Sector 2";
@@ -71,8 +101,8 @@ public class Datos {
         mapItems.put("Familia 1D", new String[]{"img0A0", "img0A1", "img0A2"});
         
         mapItems.put("Familia 2A", new String[]{"img0A0", "img0A1", "img0A2"});
-        mapItems.put("Familia 2B", new String[]{"img0A0", "img0A1", "img0A2"});
-        mapItems.put("Familia 2C", new String[]{"img0A0", "img0A1", "img0A2"});
+        mapItems.put("Familia 2B", new String[]{"img0B0", "img0B1", "img0B2"});
+        mapItems.put("Familia 2C", new String[]{"img0C0", "img0C1", "img0C2"});
         
         mapItems.put("Familia 3A", new String[]{"img1B0"});
         mapItems.put("Familia 3B", new String[]{"img0A0", "img0A1", "img0A2"});
